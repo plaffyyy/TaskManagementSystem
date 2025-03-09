@@ -60,7 +60,7 @@ public final class UserService {
      *
      * @return пользователь
      */
-    private UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService() {
         return this::getByEmail;
     }
 
