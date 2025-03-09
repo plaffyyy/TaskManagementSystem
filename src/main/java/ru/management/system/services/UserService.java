@@ -1,7 +1,6 @@
 package ru.management.system.services;
 
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -11,11 +10,10 @@ import ru.management.system.pojo.user.Role;
 import ru.management.system.pojo.user.User;
 import ru.management.system.repositories.UserRepository;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public final class UserService {
 
-    @Autowired
     private final UserRepository userRepository;
 
     /**

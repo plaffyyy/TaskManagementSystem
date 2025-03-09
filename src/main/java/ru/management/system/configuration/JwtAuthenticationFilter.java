@@ -19,6 +19,7 @@ import ru.management.system.services.security.JwtService;
 
 import java.io.IOException;
 
+//перехватывает каждый http запрос и проверяется валидность jwt токена
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
