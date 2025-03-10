@@ -33,7 +33,7 @@ public class AuthenticationService {
         var user = User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(Role.USER)
+                .role(Role.ROLE_USER)
                 .build();
 
         userService.create(user);

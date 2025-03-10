@@ -77,7 +77,7 @@ public final class UserService {
      */
     public void getAdmin() {
         var user = getCurrentUser();
-        user.setRole(Role.ADMIN);
+        user.setRole(Role.ROLE_ADMIN);
         save(user);
     }
 }
