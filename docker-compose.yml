@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d
@@ -28,6 +28,6 @@ services:
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       SPRING_PROFILES_ACTIVE: docker
     ports:
-      - "8081:8081"
+      - "8081:8080"
 volumes:
   postgres_data:
