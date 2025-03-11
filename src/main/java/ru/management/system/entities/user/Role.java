@@ -1,4 +1,4 @@
-package ru.management.system.pojo.user;
+package ru.management.system.entities.user;
 
 //security требует с припиской ROLE_
 public enum Role {
