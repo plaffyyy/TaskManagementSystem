@@ -4,7 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import ru.management.system.entities.task.Priority;
+import ru.management.system.entities.task.Status;
+import ru.management.system.entities.task.Task;
 import ru.management.system.exceptions.EmailNotUniqueException;
+import ru.management.system.exceptions.UserIsNotAdminException;
 import ru.management.system.exceptions.UserNotFoundException;
 import ru.management.system.entities.user.Role;
 import ru.management.system.entities.user.User;
@@ -79,5 +83,21 @@ public final class UserService {
         var user = getCurrentUser();
         user.setRole(Role.ROLE_ADMIN);
         save(user);
+    }
+
+    private boolean isAdmin(User user) {
+        return user.getRole().equals(Role.ROLE_ADMIN);
+    }
+
+    /**
+     *
+     * @param user текущий пользователь
+     * @param task созданная задача
+     * @throws UserIsNotAdminException если пользователь не админ
+     */
+    public void createTask(User user, Task task) {
+        if (!isAdmin(user)) throw new UserIsNotAdminException("У пользователя нет прав администратора");
+        user.getAssignedTasks().add(task);
+        userRepository.save(user);
     }
 }

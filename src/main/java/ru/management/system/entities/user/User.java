@@ -2,10 +2,7 @@ package ru.management.system.entities.user;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.management.system.entities.task.Task;
@@ -17,7 +14,7 @@ import java.util.Set;
 
 @Entity
 @Builder //pattern builder from lombok, used in bean creation
-@Data
+@Setter @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
