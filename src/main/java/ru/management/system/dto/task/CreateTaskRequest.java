@@ -1,4 +1,4 @@
-package ru.management.system.dto.user;
+package ru.management.system.dto.task;
 
 import jakarta.validation.constraints.Size;
 
