@@ -4,15 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.management.system.dto.task.AssignUserRequest;
 import ru.management.system.dto.task.CreateTaskRequest;
-import ru.management.system.dto.task.UpdateDescriptionRequest;
 import ru.management.system.dto.task.UpdateRequest;
 import ru.management.system.entities.user.User;
 import ru.management.system.services.TaskService;
 import ru.management.system.services.UserService;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
@@ -35,7 +31,7 @@ public class AdminControllers {
     public void updateDescription(@RequestBody @Valid UpdateRequest request) {
 
         if (userService.isAdmin()) {
-            taskService.updateDescriptionForTasks(request.name(), request.newDescription());
+            taskService.updateDescriptionForTask(request.name(), request.newDescription());
         }
 
     }
@@ -48,6 +44,15 @@ public class AdminControllers {
             User user = userService.getByEmail(request.email());
             var task = taskService.updateAssigneesForTask(request.name(), user);
             userService.updateTaskAssigned(user, task);
+        }
+    }
+
+    @Operation(summary = "Поменять статус задачи")
+    @PatchMapping("/update-status")
+    public void updateStatus(@RequestBody @Valid UpdateRequest request) {
+
+        if (userService.isAdmin()) {
+            taskService.updateStatusForTask(request.name(), request.newStatus());
         }
     }
 

@@ -1,14 +1,17 @@
 package ru.management.system.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.info.SslInfo;
 import org.springframework.stereotype.Service;
 import ru.management.system.dto.task.AssignUserRequest;
 import ru.management.system.dto.task.CreateTaskRequest;
 import ru.management.system.dto.task.UpdateDescriptionRequest;
+import ru.management.system.entities.task.Status;
 import ru.management.system.entities.task.Task;
 import ru.management.system.entities.user.User;
 import ru.management.system.exceptions.TaskIsNotUniqueException;
 import ru.management.system.exceptions.TaskNotFoundException;
+import ru.management.system.exceptions.UndefinedStatusException;
 import ru.management.system.repositories.TaskRepository;
 
 import java.util.List;
@@ -47,15 +50,37 @@ public class TaskService {
     }
 
     /**
+     * проверяем есть ли задача с таким именем и получаем ее
+     * @param taskName имя задачи
+     * @return task задача
+     */
+    private Task getTaskByName(String taskName) {
+        if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
+        return taskRepository.getTaskByName(taskName);
+    }
+    /**
      *
      * @param taskName название задачи
      * @param newDescription новое описание задачи
      */
-    public void updateDescriptionForTasks(String taskName, String newDescription) {
-        if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
-        Task task = taskRepository.getTaskByName(taskName);
+    public void updateDescriptionForTask(String taskName, String newDescription) {
+        Task task = getTaskByName(taskName);
 
         task.setDescription(newDescription);
+        taskRepository.save(task);
+
+    }
+
+    /**
+     * обновляем статус по строке
+     * @param taskName название задачи
+     * @param newStatus новый статус задачи
+     * @throws UndefinedStatusException если нет такого статуса в enum Status
+     */
+    public void updateStatusForTask(String taskName, String newStatus) {
+        Task task = getTaskByName(taskName);
+
+        task.setStatus(Status.statusFromString(newStatus.toLowerCase()));
         taskRepository.save(task);
 
     }
@@ -64,11 +89,10 @@ public class TaskService {
      *
      * @param taskName имя задачи для изменения
      * @param user для какого пользователя добавляем задачу
-     * @return задачу которую добавили
+     * @return задачу, которую добавили
      */
     public Task updateAssigneesForTask(String taskName, User user) {
-        if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
-        Task task = taskRepository.getTaskByName(taskName);
+        Task task = getTaskByName(taskName);
 
         task.getAssignees().add(user);
         taskRepository.save(task);
