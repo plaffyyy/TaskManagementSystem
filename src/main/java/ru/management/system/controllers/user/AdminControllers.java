@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.management.system.dto.task.CreateTaskRequest;
+import ru.management.system.dto.task.DeleteRequest;
 import ru.management.system.dto.task.UpdateRequest;
 import ru.management.system.entities.user.User;
 import ru.management.system.services.TaskService;
@@ -64,6 +65,26 @@ public class AdminControllers {
             taskService.updatePriorityForTask(request.name(), request.newPriority());
         }
     }
+    @Operation(summary = "Добавить комментарий к задаче")
+    @PatchMapping("/add-comment")
+    public void addComment(@RequestBody @Valid UpdateRequest request) {
+
+        if (userService.isAdmin()) {
+            taskService.addComment(request.name(), request.commentText());
+        }
+
+    }
+
+    @Operation(summary = "Удалить задачу")
+    @PatchMapping("/delete-task")
+    public void deleteTask(@RequestBody @Valid DeleteRequest request) {
+
+        if (userService.isAdmin()) {
+            taskService.deleteTask(request.name());
+        }
+
+    }
+
 
 
 }

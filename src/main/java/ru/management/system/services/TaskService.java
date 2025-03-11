@@ -3,6 +3,7 @@ package ru.management.system.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.management.system.dto.task.CreateTaskRequest;
+import ru.management.system.entities.comment.Comment;
 import ru.management.system.entities.task.Priority;
 import ru.management.system.entities.task.Status;
 import ru.management.system.entities.task.Task;
@@ -14,6 +15,7 @@ import ru.management.system.exceptions.UndefinedPriorityException;
 import ru.management.system.repositories.TaskRepository;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -111,5 +113,36 @@ public class TaskService {
         task.getAssignees().add(user);
         taskRepository.save(task);
         return task;
+    }
+
+    /**
+     * добавляем новый комментарий к задаче
+     * @param taskName имя задачи, чтобы ее найти
+     * @param commentText текст комментария
+     */
+    public void addComment(String taskName, String commentText) {
+        Task task = getTaskByName(taskName);
+
+        Comment comment = new Comment(commentText, task);
+
+        task.getComments().add(comment);
+        taskRepository.save(task);
+    }
+
+    /**
+     * удаляем задачу из списка задач, и у всех пользователей,
+     * которые выполняют эту задачу
+     * @param taskName имя задачи
+     */
+    public void deleteTask(String taskName) {
+        Task task = getTaskByName(taskName);
+        Set<User> users = task.getAssignees();
+        for (User user: users) {
+            user.getAssignedTasks().remove(task);
+        }
+
+        taskRepository.delete(task);
+
+
     }
 }
