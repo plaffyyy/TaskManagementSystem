@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import ru.management.system.dto.task.AssignUserRequest;
 import ru.management.system.dto.task.CreateTaskRequest;
 import ru.management.system.dto.task.UpdateDescriptionRequest;
+import ru.management.system.dto.task.UpdateRequest;
 import ru.management.system.entities.user.User;
 import ru.management.system.services.TaskService;
 import ru.management.system.services.UserService;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
@@ -29,21 +32,21 @@ public class AdminControllers {
     }
     @Operation(summary = "Редактирование описания для задачи")
     @PatchMapping("/update-description")
-    public void updateDescription(@RequestBody @Valid UpdateDescriptionRequest request) {
+    public void updateDescription(@RequestBody @Valid UpdateRequest request) {
 
         if (userService.isAdmin()) {
-            taskService.updateDescriptionForTasks(request);
+            taskService.updateDescriptionForTasks(request.name(), request.newDescription());
         }
 
     }
 
     @Operation(summary = "Назначение исполнителей задачи по email")
     @PatchMapping("/update-assignees")
-    public void updateAssignees(@RequestBody @Valid AssignUserRequest request) {
+    public void updateAssignees(@RequestBody @Valid UpdateRequest request) {
 
         if (userService.isAdmin()) {
             User user = userService.getByEmail(request.email());
-            var task = taskService.updateAssigneesForTask(request, user);
+            var task = taskService.updateAssigneesForTask(request.name(), user);
             userService.updateTaskAssigned(user, task);
         }
     }

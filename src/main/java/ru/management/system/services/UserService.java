@@ -96,17 +96,17 @@ public final class UserService {
         return true;
     }
 
-    /**
-     *
-     * @param user текущий пользователь
-     * @param task созданная задача
-     * @throws UserIsNotAdminException если пользователь не админ
-     */
-    public void createTask(User user, Task task) {
-        if (!isAdmin()) throw new UserIsNotAdminException("У пользователя нет прав администратора");
-        user.getAssignedTasks().add(task);
-        userRepository.save(user);
-    }
+//    /**
+//     *
+//     * @param user текущий пользователь
+//     * @param task созданная задача
+//     * @throws UserIsNotAdminException если пользователь не админ
+//     */
+//    public void createTask(User user, Task task) {
+//        if (!isAdmin()) throw new UserIsNotAdminException("У пользователя нет прав администратора");
+//        user.getAssignedTasks().add(task);
+//        userRepository.save(user);
+//    }
 
     /**
      *

@@ -8,6 +8,7 @@ import ru.management.system.dto.task.UpdateDescriptionRequest;
 import ru.management.system.entities.task.Task;
 import ru.management.system.entities.user.User;
 import ru.management.system.exceptions.TaskIsNotUniqueException;
+import ru.management.system.exceptions.TaskNotFoundException;
 import ru.management.system.repositories.TaskRepository;
 
 import java.util.List;
@@ -47,22 +48,28 @@ public class TaskService {
 
     /**
      *
-     * @param request json с новым описанием и названием задачи
-     * @return Task возвращаем задачу с отредактированным описанием
-     * все задачи имеют уникальные имена
+     * @param taskName название задачи
+     * @param newDescription новое описание задачи
      */
-    public void updateDescriptionForTasks(UpdateDescriptionRequest request) {
+    public void updateDescriptionForTasks(String taskName, String newDescription) {
+        if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
+        Task task = taskRepository.getTaskByName(taskName);
 
-        Task task = taskRepository.getTaskByName(request.name());
-
-        task.setDescription(request.newDescription());
+        task.setDescription(newDescription);
         taskRepository.save(task);
 
     }
 
-    public Task updateAssigneesForTask(AssignUserRequest request, User user) {
+    /**
+     *
+     * @param taskName имя задачи для изменения
+     * @param user для какого пользователя добавляем задачу
+     * @return задачу которую добавили
+     */
+    public Task updateAssigneesForTask(String taskName, User user) {
+        if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
+        Task task = taskRepository.getTaskByName(taskName);
 
-        Task task = taskRepository.getTaskByName(request.name());
         task.getAssignees().add(user);
         taskRepository.save(task);
         return task;
