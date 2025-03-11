@@ -1,18 +1,31 @@
 package ru.management.system.entities.task;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.management.system.entities.comment.Comment;
 import ru.management.system.entities.user.User;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
 @Table(name = "tasks")
 public class Task {
+    public Task(String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.status = Status.NOT_STARTED;
+        this.priority = Priority.MEDIUM;
+        this.assignees = new HashSet<>();
+        this.comments = new ArrayList<>();
+    }
 
     @Id
     @Column(name = "id")
