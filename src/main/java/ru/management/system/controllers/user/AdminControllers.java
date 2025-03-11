@@ -56,5 +56,14 @@ public class AdminControllers {
         }
     }
 
+    @Operation(summary = "Поменять статус задачи")
+    @PatchMapping("/update-priority")
+    public void updatePriority(@RequestBody @Valid UpdateRequest request) {
+
+        if (userService.isAdmin()) {
+            taskService.updatePriorityForTask(request.name(), request.newPriority());
+        }
+    }
+
 
 }

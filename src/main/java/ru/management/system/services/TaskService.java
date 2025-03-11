@@ -1,17 +1,16 @@
 package ru.management.system.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.info.SslInfo;
 import org.springframework.stereotype.Service;
-import ru.management.system.dto.task.AssignUserRequest;
 import ru.management.system.dto.task.CreateTaskRequest;
-import ru.management.system.dto.task.UpdateDescriptionRequest;
+import ru.management.system.entities.task.Priority;
 import ru.management.system.entities.task.Status;
 import ru.management.system.entities.task.Task;
 import ru.management.system.entities.user.User;
 import ru.management.system.exceptions.TaskIsNotUniqueException;
 import ru.management.system.exceptions.TaskNotFoundException;
 import ru.management.system.exceptions.UndefinedStatusException;
+import ru.management.system.exceptions.UndefinedPriorityException;
 import ru.management.system.repositories.TaskRepository;
 
 import java.util.List;
@@ -84,6 +83,21 @@ public class TaskService {
         taskRepository.save(task);
 
     }
+
+    /**
+     * обновляем приоритет по строке
+     * @param taskName название задачи
+     * @param newPriority новый приоритет задачи
+     * @throws UndefinedPriorityException если нет такого приоритета в enum Priority
+     */
+    public void updatePriorityForTask(String taskName, String newPriority) {
+        Task task = getTaskByName(taskName);
+
+        task.setPriority(Priority.priorityFromString(newPriority.toLowerCase()));
+        taskRepository.save(task);
+
+    }
+
 
     /**
      *
