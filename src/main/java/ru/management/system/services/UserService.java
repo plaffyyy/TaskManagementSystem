@@ -69,7 +69,7 @@ public final class UserService {
     /**
      * Получение текущего пользователя из контекста Spring Security
      *
-     * @return
+     * @return текущий пользователь
      */
     public User getCurrentUser() {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -85,8 +85,15 @@ public final class UserService {
         save(user);
     }
 
-    private boolean isAdmin(User user) {
-        return user.getRole().equals(Role.ROLE_ADMIN);
+    /**
+     * @return true если пользователь админ
+     * @throws UserIsNotAdminException если у пользователя нет прав админа
+     */
+    public boolean isAdmin() {
+        if (!getCurrentUser().getRole().equals(Role.ROLE_ADMIN)) {
+            throw new UserIsNotAdminException("У пользователя нет прав администратора");
+        }
+        return true;
     }
 
     /**
@@ -96,7 +103,17 @@ public final class UserService {
      * @throws UserIsNotAdminException если пользователь не админ
      */
     public void createTask(User user, Task task) {
-        if (!isAdmin(user)) throw new UserIsNotAdminException("У пользователя нет прав администратора");
+        if (!isAdmin()) throw new UserIsNotAdminException("У пользователя нет прав администратора");
+        user.getAssignedTasks().add(task);
+        userRepository.save(user);
+    }
+
+    /**
+     *
+     * @param user пользователь для назначения задачи
+     * @param task задача для этого пользователя
+     */
+    public void updateTaskAssigned(User user, Task task) {
         user.getAssignedTasks().add(task);
         userRepository.save(user);
     }
