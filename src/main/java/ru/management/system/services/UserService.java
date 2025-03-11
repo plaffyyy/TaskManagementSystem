@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ru.management.system.exceptions.EmailNotUniqueException;
 import ru.management.system.exceptions.UserNotFoundException;
-import ru.management.system.pojo.user.Role;
-import ru.management.system.pojo.user.User;
+import ru.management.system.entities.user.Role;
+import ru.management.system.entities.user.User;
 import ru.management.system.repositories.UserRepository;
 
 @RequiredArgsConstructor

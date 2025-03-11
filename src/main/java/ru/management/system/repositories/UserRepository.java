@@ -2,7 +2,7 @@ package ru.management.system.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.management.system.pojo.user.User;
+import ru.management.system.entities.user.User;
 
 import java.util.Optional;
 
