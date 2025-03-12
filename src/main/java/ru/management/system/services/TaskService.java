@@ -26,6 +26,16 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final CommentRepository commentRepository;
+    private final UserService userService;
+
+    /**
+     * проверка есть ли права у пользователя
+     * @throws UserIsNotAdminException если нет прав
+     */
+    private void isAdmin() {
+        if (!userService.isAdmin()) throw new UserIsNotAdminException("У пользователя нет прав администратора");
+    }
+
 
     /**
      * проверка что у новой задачи уникальное имя
@@ -45,6 +55,7 @@ public class TaskService {
      * по дефолту создается задача, которая никому не назначена
      */
     public void saveTask(CreateTaskRequest request) {
+        isAdmin();
         if (!isUniqueTaskName(request)) throw new TaskIsNotUniqueException("Данная задача уже существует");
         Task task = new Task(
                 request.name(),
@@ -58,8 +69,11 @@ public class TaskService {
      * проверяем есть ли задача с таким именем и получаем ее
      * @param taskName имя задачи
      * @return task задача
+     * @throws UserIsNotAdminException если нет прав админа
+     * @throws TaskNotFoundException если нет задачи с таким именем
      */
     private Task getTaskByName(String taskName) {
+        isAdmin();
         if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
         return taskRepository.getTaskByName(taskName);
     }
