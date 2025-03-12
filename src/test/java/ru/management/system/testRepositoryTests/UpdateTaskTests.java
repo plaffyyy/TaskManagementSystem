@@ -1,4 +1,5 @@
 package ru.management.system.testRepositoryTests;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,13 +9,13 @@ import ru.management.system.entities.comment.Comment;
 import ru.management.system.entities.task.Priority;
 import ru.management.system.entities.task.Task;
 import ru.management.system.exceptions.UndefinedPriorityException;
-import ru.management.system.exceptions.UndefinedStatusException;
 import ru.management.system.repositories.CommentRepository;
 import ru.management.system.repositories.TaskRepository;
 import ru.management.system.services.TaskService;
 import ru.management.system.services.UserService;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
