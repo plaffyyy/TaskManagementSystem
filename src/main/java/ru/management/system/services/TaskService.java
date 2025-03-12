@@ -1,7 +1,7 @@
 package ru.management.system.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -88,8 +89,11 @@ public class TaskService {
      * @throws TaskNotFoundException если не найдена задача
      */
     private Task hasThisTask(User user, String taskName) {
+        log.info(taskName);
+        if (taskName == null) throw new TaskNotFoundException("Нет задачи с таким именем");
+        log.info(taskName);
         Task task = taskRepository.getTaskByName(taskName);
-        if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
+        log.info(task);
         if (!user.getAssignedTasks().contains(task)) throw new UserNotHasThisTask("У данного пользователя нет этой задачи");
         return task;
     }
@@ -114,11 +118,13 @@ public class TaskService {
      * @throws UndefinedStatusException если нет такого статуса в enum Status
      */
     public void updateStatusForTask(String taskName, String newStatus) {
-        Task task = getTaskByName(taskName);
-        if (task == null) {
-            task = hasThisTask(userService.getCurrentUser(),taskName);
+        Task task;
+        log.info(taskName);
+        try {
+            task = getTaskByName(taskName);
+        } catch (UserIsNotAdminException e) {
+            task = hasThisTask(userService.getCurrentUser(), taskName);
         }
-
         task.setStatus(Status.statusFromString(newStatus));
         taskRepository.save(task);
 
@@ -159,9 +165,11 @@ public class TaskService {
      * @param commentText текст комментария
      */
     public void addComment(String taskName, String commentText) {
-        Task task = getTaskByName(taskName);
-        if (task == null) {
-            task = hasThisTask(userService.getCurrentUser(),taskName);
+        Task task;
+        try {
+            task = getTaskByName(taskName);
+        } catch (UserIsNotAdminException e) {
+            task = hasThisTask(userService.getCurrentUser(), taskName);
         }
 
         Comment comment = new Comment(commentText, task);
