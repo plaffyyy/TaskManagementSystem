@@ -36,7 +36,6 @@ public class TaskService {
         if (!userService.isAdmin()) throw new UserIsNotAdminException("У пользователя нет прав администратора");
     }
 
-
     /**
      * проверка что у новой задачи уникальное имя
      * @param request запрос на создание задачи
@@ -67,6 +66,7 @@ public class TaskService {
 
     /**
      * проверяем есть ли задача с таким именем и получаем ее
+     * и есть ли права администратора для этого
      * @param taskName имя задачи
      * @return task задача
      * @throws UserIsNotAdminException если нет прав админа
@@ -77,6 +77,23 @@ public class TaskService {
         if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
         return taskRepository.getTaskByName(taskName);
     }
+
+
+    /**
+     * проверка, что если пользователь не админ
+     * то он должен иметь эту задачу для ее изменения
+     * @param user пользователь
+     * @param taskName название задачи
+     * @throws UserNotHasThisTask если нет этой задачи у пользователя
+     * @throws TaskNotFoundException если не найдена задача
+     */
+    private Task hasThisTask(User user, String taskName) {
+        Task task = taskRepository.getTaskByName(taskName);
+        if (taskName == null || taskRepository.getTaskByName(taskName) == null) throw new TaskNotFoundException("Нет задачи с таким именем");
+        if (!user.getAssignedTasks().contains(task)) throw new UserNotHasThisTask("У данного пользователя нет этой задачи");
+        return task;
+    }
+
     /**
      *
      * @param taskName название задачи
@@ -98,6 +115,9 @@ public class TaskService {
      */
     public void updateStatusForTask(String taskName, String newStatus) {
         Task task = getTaskByName(taskName);
+        if (task == null) {
+            task = hasThisTask(userService.getCurrentUser(),taskName);
+        }
 
         task.setStatus(Status.statusFromString(newStatus));
         taskRepository.save(task);
@@ -140,6 +160,9 @@ public class TaskService {
      */
     public void addComment(String taskName, String commentText) {
         Task task = getTaskByName(taskName);
+        if (task == null) {
+            task = hasThisTask(userService.getCurrentUser(),taskName);
+        }
 
         Comment comment = new Comment(commentText, task);
         commentRepository.save(comment);
