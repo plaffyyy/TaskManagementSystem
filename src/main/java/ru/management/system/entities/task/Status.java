@@ -9,7 +9,7 @@ public enum Status {
     FINISHED,
     NOT_STARTED;
     public static Status statusFromString(String status) {
-        return switch (status) {
+        return switch (status.toLowerCase()) {
             case ("executed") -> Status.EXECUTED;
             case ("finished") -> Status.FINISHED;
             case ("not started") -> Status.NOT_STARTED;

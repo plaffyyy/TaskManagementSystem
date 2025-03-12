@@ -1,19 +1,22 @@
 package ru.management.system.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.management.system.dto.task.CreateTaskRequest;
+import ru.management.system.dto.task.TaskDto;
 import ru.management.system.entities.comment.Comment;
 import ru.management.system.entities.task.Priority;
 import ru.management.system.entities.task.Status;
 import ru.management.system.entities.task.Task;
 import ru.management.system.entities.user.User;
-import ru.management.system.exceptions.TaskIsNotUniqueException;
-import ru.management.system.exceptions.TaskNotFoundException;
-import ru.management.system.exceptions.UndefinedStatusException;
-import ru.management.system.exceptions.UndefinedPriorityException;
+import ru.management.system.exceptions.*;
+import ru.management.system.repositories.CommentRepository;
 import ru.management.system.repositories.TaskRepository;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +25,7 @@ import java.util.Set;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * проверка что у новой задачи уникальное имя
@@ -81,7 +85,7 @@ public class TaskService {
     public void updateStatusForTask(String taskName, String newStatus) {
         Task task = getTaskByName(taskName);
 
-        task.setStatus(Status.statusFromString(newStatus.toLowerCase()));
+        task.setStatus(Status.statusFromString(newStatus));
         taskRepository.save(task);
 
     }
@@ -95,7 +99,7 @@ public class TaskService {
     public void updatePriorityForTask(String taskName, String newPriority) {
         Task task = getTaskByName(taskName);
 
-        task.setPriority(Priority.priorityFromString(newPriority.toLowerCase()));
+        task.setPriority(Priority.priorityFromString(newPriority));
         taskRepository.save(task);
 
     }
@@ -124,7 +128,7 @@ public class TaskService {
         Task task = getTaskByName(taskName);
 
         Comment comment = new Comment(commentText, task);
-
+        commentRepository.save(comment);
         task.getComments().add(comment);
         taskRepository.save(task);
     }
@@ -142,7 +146,44 @@ public class TaskService {
         }
 
         taskRepository.delete(task);
-
-
     }
+
+    private boolean checkSortType(String sortBy) {
+        Method[] methods = Task.class.getDeclaredMethods();
+        for (Method method: methods) {
+            if (method.getName().equals(sortBy)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * получение всех задач пользователя указывая
+     * количество задач на страницу и индекс страницы
+     * с сортировкой по полю из класса Task
+     * @param user пользователь, чьи задачи получаем
+     * @param indexPage индекс страницы начиная с 0
+     * @param itemsPerPage количество элементов на страницу
+     * @param sortBy аргумент сортировки из класса Task
+     * @return задачи по шаблону TaskDto
+     */
+    public List<TaskDto> getPerPage(User user, int indexPage, int itemsPerPage, String sortBy) {
+        if (!checkSortType(sortBy)) throw new IncorrectSortTypeException("Введите сортировку по методу из класса Task");
+        if (indexPage < 0) {
+            indexPage = 0;
+        }
+        if (itemsPerPage < 0) {
+            itemsPerPage = 0;
+        }
+        PageRequest pageable = PageRequest.of(
+                indexPage, itemsPerPage,
+                Sort.by(sortBy));
+
+        List<Task> tasks = taskRepository.findTasksByAssignees(Set.of(user), pageable);
+        return tasks.stream()
+                .map(TaskDto::fromEntity)
+                .toList();
+    }
+
 }

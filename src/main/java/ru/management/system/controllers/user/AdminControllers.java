@@ -3,13 +3,14 @@ package ru.management.system.controllers.user;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.management.system.dto.task.CreateTaskRequest;
-import ru.management.system.dto.task.DeleteRequest;
-import ru.management.system.dto.task.UpdateRequest;
+import ru.management.system.dto.task.*;
 import ru.management.system.entities.user.User;
 import ru.management.system.services.TaskService;
 import ru.management.system.services.UserService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -82,6 +83,21 @@ public class AdminControllers {
         if (userService.isAdmin()) {
             taskService.deleteTask(request.name());
         }
+
+    }
+
+    @Operation(summary = "Получить задачи конкретного исполнителя", description = "В поле sortBy вы можете передать только поля объекта Task")
+    @PostMapping("/tasks")
+    public ResponseEntity<List<TaskDto>> getTasks(@RequestBody GetTasksRequest request) {
+
+        if (userService.isAdmin()) {
+            User user = userService.getByEmail(request.email());
+            List<TaskDto> tasks = taskService.getPerPage(
+                user, request.indexOfPage(), request.itemsPerPage(),request.sortBy()
+            );
+            return ResponseEntity.ok(tasks);
+        }
+        return ResponseEntity.ofNullable(null);
 
     }
 
