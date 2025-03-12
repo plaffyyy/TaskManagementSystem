@@ -7,6 +7,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.management.system.entities.comment.Comment;
 import ru.management.system.entities.task.Priority;
 import ru.management.system.entities.task.Task;
+import ru.management.system.exceptions.UndefinedPriorityException;
+import ru.management.system.exceptions.UndefinedStatusException;
 import ru.management.system.repositories.CommentRepository;
 import ru.management.system.repositories.TaskRepository;
 import ru.management.system.services.TaskService;
@@ -44,6 +46,20 @@ public class UpdateTaskTests {
         assertEquals(Priority.HIGH, task.getPriority());
         verify(taskRepository, times(1)).save(task); // проверяем, что задача сохраняется в репозитории
     }
+
+    @Test
+    void throwUndefinedPriorityExceptionWhenStatusIsInvalid() {
+        String taskName = "Task 1";
+        String newPriority = "HIGasdH";
+        Task task = new Task("Task 1", "Some Description");
+
+        when(taskRepository.getTaskByName(taskName)).thenReturn(task);
+        when(userService.isAdmin()).thenReturn(true);
+
+        assertThrows(UndefinedPriorityException.class, () -> {
+            taskService.updatePriorityForTask(taskName, newPriority);
+        });
+    }
     @Test
     void addCommentToTask() {
 
@@ -60,4 +76,5 @@ public class UpdateTaskTests {
         assertEquals(commentText, task.getComments().get(0).getText()); // проверяем, что текст комментария совпадает
         verify(commentRepository, times(1)).save(any(Comment.class)); // проверяем, что комментарий сохранен
     }
+
 }
